@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Unidos por Ixtlahuaca</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);</script>
+    <!-- GA -->
+</head>
+<body class="bg-white">
+    <nav id="navbar" class="bg-white shadow-sm border-b border-gray-200"></nav>
+    <main class="max-w-4xl mx-auto px-4 py-12" id="admin-content" style="display:none;">
+        <h1 class="text-3xl font-bold text-blue-900 mb-8">Panel de Administración</h1>
+        
+        <!-- Publicar nueva acción -->
+        <div class="bg-white border rounded-lg p-6 mb-10">
+            <h2 class="text-xl font-semibold mb-4">Nueva acción / comentario diario</h2>
+            <form id="action-form" class="space-y-4">
+                <input type="text" id="title" placeholder="Título" required class="w-full border rounded px-4 py-2">
+                <textarea id="content" placeholder="Contenido" rows="3" class="w-full border rounded px-4 py-2"></textarea>
+                <input type="url" id="image_url" placeholder="URL de imagen (opcional)" class="w-full border rounded px-4 py-2">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Publicar</button>
+            </form>
+        </div>
+
+        <!-- Lista de acciones -->
+        <div>
+            <h2 class="text-xl font-semibold mb-4">Acciones publicadas</h2>
+            <div id="actions-list" class="space-y-4"></div>
+        </div>
+
+        <!-- Logs (opcional) -->
+        <div class="mt-12">
+            <h2 class="text-xl font-semibold mb-4">Actividad reciente (logs)</h2>
+            <div id="logs-container" class="space-y-2 text-sm"></div>
+        </div>
+    </main>
+    <div id="unauthorized" class="hidden text-center py-12 text-red-500 text-xl">No tienes permisos de administrador.</div>
+    <footer id="footer" class="bg-gray-50 border-t border-gray-200 text-center py-6 text-sm text-gray-600"></footer>
+
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let currentUser = null;
+
+        async function initAdmin() {
+            currentUser = await getCurrentUser();
+            if (!currentUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const isAdmin = await checkAdmin(currentUser.id);
+            if (!isAdmin) {
+                document.getElementById('unauthorized').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('admin-content').style.display = 'block';
+            await loadNavFooter();
+            await loadActionsList();
+            await loadLogs();
+        }
+
+        async function loadActionsList() {
+            const { data, error } = await supabase
+                .from('actions')
+                .select('*')
+                .order('created_at', { ascending: false });
+            const container = document.getElementById('actions-list');
+            if (data) {
+                container.innerHTML = data.map(a => `
+                    <div class="flex justify-between items-start border p-4 rounded">
+                        <div>
+                            <h3 class="font-bold text-blue-800">${a.title}</h3>
+                            <p class="text-gray-600">${a.content || ''}</p>
+                            <span class="text-xs text-gray-400">${new Date(a.created_at).toLocaleString()}</span>
+                        </div>
+                        <button onclick="deleteAction(${a.id})" class="text-red-500 hover:underline ml-4">Eliminar</button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        window.deleteAction = async (id) => {
+            if (!confirm('¿Eliminar esta acción?')) return;
+            const { error } = await supabase.from('actions').delete().eq('id', id);
+            if (!error) {
+                await loadActionsList();
+                await logActivity('admin_delete_action', { action_id: id });
+            }
+        };
+
+        async function loadLogs() {
+            const { data, error } = await supabase
+                .from('logs')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+            const container = document.getElementById('logs-container');
+            if (data) {
+                container.innerHTML = data.map(l => `
+                    <div class="flex gap-4 py-1 border-b">
+                        <span class="text-gray-500 w-32">${new Date(l.created_at).toLocaleString()}</span>
+                        <span class="font-medium">${l.action}</span>
+                        <span class="text-gray-400">${JSON.stringify(l.details)}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        document.getElementById('action-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const image_url = document.getElementById('image_url').value.trim();
+            if (!title) return;
+            const { error } = await supabase.from('actions').insert({
+                title,
+                content,
+                image_url: image_url || null,
+                created_by: currentUser.id
+            });
+            if (!error) {
+                document.getElementById('action-form').reset();
+                await loadActionsList();
+                await logActivity('admin_add_action', { title });
+            } else {
+                alert('Error: ' + error.message);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', initAdmin);
+    </script>
+</body>
+</html>

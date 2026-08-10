@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Militantes - Unidos por Ixtlahuaca</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);</script>
+    <!-- GA -->
+</head>
+<body class="bg-white">
+    <nav id="navbar" class="bg-white shadow-sm border-b border-gray-200"></nav>
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <h1 class="text-3xl font-bold text-blue-900 mb-8">Militantes del Movimiento</h1>
+        <input type="text" id="search-input" placeholder="Buscar por apellido..." class="w-full max-w-md border rounded px-4 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <div id="militants-list" class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"></div>
+    </main>
+    <footer id="footer" class="bg-gray-50 border-t border-gray-200 text-center py-6 text-sm text-gray-600"></footer>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        async function searchMilitants(term = '') {
+            let query = supabase.from('militants').select('*').order('last_name', { ascending: true });
+            if (term) {
+                query = query.ilike('last_name', `%${term}%`);
+            }
+            const { data, error } = await query;
+            const container = document.getElementById('militants-list');
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(m => `
+                    <div class="border rounded-lg p-4 flex gap-4 items-center bg-white shadow-sm">
+                        <img src="${m.photo_url || 'https://via.placeholder.com/64'}" alt="${m.first_name} ${m.last_name}" class="w-16 h-16 rounded-full object-cover">
+                        <div>
+                            <h3 class="font-semibold text-blue-900">${m.first_name} ${m.last_name}</h3>
+                            ${m.description ? `<p class="text-sm text-gray-600">${m.description}</p>` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<p class="text-gray-500 col-span-3">No se encontraron militantes.</p>';
+            }
+        }
+
+        document.getElementById('search-input').addEventListener('input', (e) => {
+            searchMilitants(e.target.value);
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadNavFooter();
+            searchMilitants();
+        });
+    </script>
+</body>
+</html>

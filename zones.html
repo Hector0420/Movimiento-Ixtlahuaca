@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zonas de Diagnóstico - Unidos por Ixtlahuaca</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/config.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);</script>
+    <!-- GA igual que antes -->
+</head>
+<body class="bg-white">
+    <nav id="navbar" class="bg-white shadow-sm border-b border-gray-200"></nav>
+    <main class="max-w-6xl mx-auto px-4 py-12">
+        <h1 class="text-4xl font-bold text-blue-900 mb-8">Las 5 Zonas del Diagnóstico Ciudadano</h1>
+        <div class="space-y-10">
+            <!-- Zona 1 Centro -->
+            <div>
+                <h2 class="text-2xl font-semibold text-blue-800">Zona 1: Centro (Corazón Político, Comercial e Industrial)</h2>
+                <p class="text-gray-600">Cabecera municipal, barrios tradicionales, Zona Industrial. Problemas: ordenamiento comercial y vial, ausencia de Central de Abastos, colapso de drenaje y alcantarillado, gestión de residuos.</p>
+                <p class="text-blue-700 font-medium mt-2">Ángulo del Maestro: "Ordenamiento con Justicia".</p>
+            </div>
+            <!-- Zona 2 Norte -->
+            <div>
+                <h2 class="text-2xl font-semibold text-blue-800">Zona 2: Norte (Corredor de los Baños)</h2>
+                <p class="text-gray-600">San Pedro, La Concepción, Jalpa. Problemas: inseguridad en vías, saneamiento de cuerpos de agua, falta de modernización.</p>
+                <p class="text-blue-700 font-medium mt-2">Ángulo del Maestro: "Desarrollo Seguro y Conectado".</p>
+            </div>
+            <!-- Zona 3 Sur -->
+            <div>
+                <h2 class="text-2xl font-semibold text-blue-800">Zona 3: Sur (Núcleo Mazahua de Resistencia y Artesanía)</h2>
+                <p class="text-gray-600">San Lorenzo Tóxico, San Antonio Bonixi, San Jerónimo Ixtapantongo. Problemas: explotación textil, rezago en pavimentación, extracción hídrica histórica (Convenio Alto Lerma 1966).</p>
+                <p class="text-blue-700 font-medium mt-2">Ángulo del Maestro: "Reconstrucción del Tejido Social y Justicia Histórica".</p>
+            </div>
+            <!-- Zona 4 Oriente -->
+            <div>
+                <h2 class="text-2xl font-semibold text-blue-800">Zona 4: Oriente (Llanos Agrícolas)</h2>
+                <p class="text-gray-600">San Bartola del Llano, Santa María del Llano. Problemas: colapso agropecuario por abatimiento de mantos freáticos, abandono de caminos saca-cosechas.</p>
+                <p class="text-blue-700 font-medium mt-2">Ángulo del Maestro: "Defensa del Recurso y la Productividad".</p>
+            </div>
+            <!-- Zona 5 Poniente -->
+            <div>
+                <h2 class="text-2xl font-semibold text-blue-800">Zona 5: Poniente (Corredor Fronterizo de los Enyeges)</h2>
+                <p class="text-gray-600">Los Enyeges, San Juan de las Manzanas, Santa Ana la Ladera. Problemas: fuga de jóvenes, deserción escolar, desconexión administrativa.</p>
+                <p class="text-blue-700 font-medium mt-2">Ángulo del Maestro: "Integración, Gobernanza y Futuro".</p>
+            </div>
+        </div>
+    </main>
+    <footer id="footer" class="bg-gray-50 border-t border-gray-200 text-center py-6 text-sm text-gray-600"></footer>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
+    <script>window.addEventListener('DOMContentLoaded', loadNavFooter);</script>
+</body>
+</html>
