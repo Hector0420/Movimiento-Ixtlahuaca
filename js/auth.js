@@ -1,6 +1,6 @@
 // Obtener usuario actual
 async function getCurrentUser() {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getCurrentUser();
     return user;
 }
 
